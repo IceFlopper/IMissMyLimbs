@@ -53,7 +53,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonUtils.cs" />
     <Compile Include="IMissMyLimb.cs" />
+    <Compile Include="Patch_AddHediff.cs" />
+    <Compile Include="Patch_RemoveHediff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
