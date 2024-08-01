@@ -11,7 +11,7 @@ public static class CommonUtils
             return false;
         }
         bool result = part.def.defName.Contains("Finger") || part.def.defName.Contains("Toe");
-        Log.Message($"IMissMyLimb: IsFingerOrToe check for {part.def.defName}: {result}");
+        // Log.Message($"IMissMyLimb: IsFingerOrToe check for {part.def.defName}: {result}");
         return result;
     }
 
@@ -41,7 +41,7 @@ public static class CommonUtils
             stageIndex = 1; // Use second stage for multiple lost parts of the same type
         }
 
-        Log.Message($"IMissMyLimb: Assigning thought {thoughtDef.defName} at stage {stageIndex} to pawn {pawn.Name.ToStringFull} for part {part.def.defName}");
+        // Log.Message($"IMissMyLimb: Assigning thought {thoughtDef.defName} at stage {stageIndex} to pawn {pawn.Name.ToStringFull} for part {part.def.defName}");
 
         var thought = ThoughtMaker.MakeThought(thoughtDef, stageIndex);
         pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
@@ -61,14 +61,14 @@ public static class CommonUtils
             {
                 if (comp is HediffCompProperties_VerbGiver || comp is HediffCompProperties_Disappears)
                 {
-                    Log.Message($"IMissMyLimb: {hediffDef.defName} is recognized as a prosthetic.");
+                    // Log.Message($"IMissMyLimb: {hediffDef.defName} is recognized as a prosthetic.");
                     return true;
                 }
 
                 // Additional checks for common prosthetic properties
                 if (comp is HediffCompProperties_SeverityPerDay || comp is HediffCompProperties_Immunizable || comp is HediffCompProperties_TendDuration)
                 {
-                    Log.Message($"IMissMyLimb: {hediffDef.defName} has a common prosthetic component.");
+                    // Log.Message($"IMissMyLimb: {hediffDef.defName} has a common prosthetic component.");
                     return true;
                 }
             }
@@ -77,11 +77,11 @@ public static class CommonUtils
         // Additional checks for known prosthetic keywords
         if (hediffDef.defName.Contains("Prosthetic") || hediffDef.defName.Contains("Bionic") || hediffDef.defName.Contains("SimpleProsthetic"))
         {
-            Log.Message($"IMissMyLimb: {hediffDef.defName} is recognized by keyword as a prosthetic.");
+            // Log.Message($"IMissMyLimb: {hediffDef.defName} is recognized by keyword as a prosthetic.");
             return true;
         }
 
-        Log.Message($"IMissMyLimb: {hediffDef.defName} is not recognized as a prosthetic.");
+        // Log.Message($"IMissMyLimb: {hediffDef.defName} is not recognized as a prosthetic.");
         return false;
     }
 

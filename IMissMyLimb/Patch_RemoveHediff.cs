@@ -9,7 +9,7 @@ public static class Patch_RemoveHediff
     [HarmonyPostfix]
     public static void Postfix(Pawn_HealthTracker __instance, Hediff hediff)
     {
-        Log.Message("IMissMyLimb: RemoveHediff Postfix method called.");
+        // Log.Message("IMissMyLimb: RemoveHediff Postfix method called.");
         try
         {
             if (__instance == null)
@@ -35,11 +35,11 @@ public static class Patch_RemoveHediff
             string hediffName = hediff.def?.defName ?? "unknown hediff";
             string partName = hediff.Part?.def?.defName ?? "no body part";
 
-            Log.Message($"IMissMyLimb: Pawn {pawnName} had Hediff {hediffName} removed from {partName}.");
+            // Log.Message($"IMissMyLimb: Pawn {pawnName} had Hediff {hediffName} removed from {partName}.");
 
             if (hediff.Part != null && hediff is Hediff_MissingPart)
             {
-                Log.Message($"IMissMyLimb: Removed missing part hediff from {partName}.");
+                // Log.Message($"IMissMyLimb: Removed missing part hediff from {partName}.");
                 CommonUtils.RemoveNegativeThought(pawn, hediff.Part);
             }
         }
