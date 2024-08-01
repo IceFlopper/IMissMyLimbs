@@ -1,0 +1,49 @@
+﻿<Defs>
+  <!-- Minor injuries (fingers, toes) -->
+  <ThoughtDef>
+    <defName>ColonistLostFingerToe</defName>
+    <label>lost a finger/toe</label>
+    <description>I lost a finger or toe. It's a small loss, but still bothers me.</description>
+    <durationDays>-1</durationDays>
+    <stackLimit>1</stackLimit>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <stages>
+      <li>
+        <baseMoodEffect>-1</baseMoodEffect>
+        <label>lost a finger/toe</label>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <!-- Moderate injuries (damaged arm/leg) -->
+  <ThoughtDef>
+    <defName>ColonistDamagedArmLeg</defName>
+    <label>arm/leg was hurt</label>
+    <description>My arm or leg was badly hurt. It affects my mood.</description>
+    <durationDays>-1</durationDays>
+    <stackLimit>1</stackLimit>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <stages>
+      <li>
+        <baseMoodEffect>-2</baseMoodEffect>
+        <label>arm/leg was hurt</label>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <!-- Severe injuries (lost arm/leg) -->
+  <ThoughtDef>
+    <defName>ColonistLostArmLeg</defName>
+    <label>lost an arm/leg</label>
+    <description>I lost an arm or leg. This is devastating.</description>
+    <durationDays>-1</durationDays>
+    <stackLimit>1</stackLimit>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <stages>
+      <li>
+        <baseMoodEffect>-5</baseMoodEffect>
+        <label>lost an arm/leg</label>
+      </li>
+    </stages>
+  </ThoughtDef>
+</Defs>
