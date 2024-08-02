@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RimWorld;
 using System;
+using System.Linq;
 using Verse;
 
 [HarmonyPatch(typeof(Pawn_HealthTracker))]
@@ -32,49 +33,46 @@ public static class Patch_AddHediff
                 return;
             }
 
-            if (hediff is Hediff_MissingPart missingPart)
+            // Check if the hediff is a prosthetic
+            if (CommonUtils.IsProsthetic(hediff.def) && hediff.Part != null)
             {
-                if (missingPart.Part == null)
-                {
-                    Log.Error("IMissMyLimb: missingPart.Part is null.");
-                    return;
-                }
+                // Remove previous prosthetic moodlets
+                CommonUtils.RemoveProstheticThought(pawn, hediff.Part);
 
-                if (CommonUtils.IsFingerOrToe(missingPart.Part))
-                {
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistLostFingerToe"), missingPart.Part);
-                }
-                else if (missingPart.Part.def == BodyPartDefOf.Arm)
-                {
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistLostArm"), missingPart.Part);
-                }
-                else if (missingPart.Part.def == BodyPartDefOf.Leg)
-                {
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistLostLeg"), missingPart.Part);
-                }
-            }
-            else if (hediff.Part != null && CommonUtils.IsProsthetic(hediff.def))
-            {
-                CommonUtils.RemoveNegativeThought(pawn, hediff.Part);
                 ThoughtDef thoughtDef = null;
-                int stageIndex = 0;
 
+                int prostheticArmCount = pawn.health.hediffSet.hediffs.Count(h => h.Part?.def == BodyPartDefOf.Arm && CommonUtils.IsProsthetic(h.def));
+                int prostheticLegCount = pawn.health.hediffSet.hediffs.Count(h => h.Part?.def == BodyPartDefOf.Leg && CommonUtils.IsProsthetic(h.def));
+
+                // Determine the new thought based on the type of prosthetic
                 if (CommonUtils.IsArchotech(hediff.def))
                 {
                     if (CommonUtils.IsFingerOrToe(hediff.Part))
                     {
-                        thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticFingerToe");
-                        stageIndex = 2;
+                        thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechFingerToe");
                     }
                     else if (hediff.Part.def == BodyPartDefOf.Arm)
                     {
-                        thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticArm");
-                        stageIndex = 2;
+                        thoughtDef = prostheticArmCount > 1 ? ThoughtDef.Named("IMissMyLimb_ColonistGotBothArchotechArms") : ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechArm");
                     }
                     else if (hediff.Part.def == BodyPartDefOf.Leg)
                     {
-                        thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticLeg");
-                        stageIndex = 2;
+                        thoughtDef = prostheticLegCount > 1 ? ThoughtDef.Named("IMissMyLimb_ColonistGotBothArchotechLegs") : ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechLeg");
+                    }
+                }
+                else if (hediff.def.defName.Contains("Bionic"))
+                {
+                    if (CommonUtils.IsFingerOrToe(hediff.Part))
+                    {
+                        thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticFingerToe");
+                    }
+                    else if (hediff.Part.def == BodyPartDefOf.Arm)
+                    {
+                        thoughtDef = prostheticArmCount > 1 ? ThoughtDef.Named("IMissMyLimb_ColonistGotBothBionicArms") : ThoughtDef.Named("IMissMyLimb_ColonistGotBionicArm");
+                    }
+                    else if (hediff.Part.def == BodyPartDefOf.Leg)
+                    {
+                        thoughtDef = prostheticLegCount > 1 ? ThoughtDef.Named("IMissMyLimb_ColonistGotBothBionicLegs") : ThoughtDef.Named("IMissMyLimb_ColonistGotBionicLeg");
                     }
                 }
                 else
@@ -85,19 +83,22 @@ public static class Patch_AddHediff
                     }
                     else if (hediff.Part.def == BodyPartDefOf.Arm)
                     {
-                        thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticArm");
+                        thoughtDef = prostheticArmCount > 1 ? ThoughtDef.Named("IMissMyLimb_ColonistGotBothProstheticArms") : ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticArm");
                     }
                     else if (hediff.Part.def == BodyPartDefOf.Leg)
                     {
-                        thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticLeg");
+                        thoughtDef = prostheticLegCount > 1 ? ThoughtDef.Named("IMissMyLimb_ColonistGotBothProstheticLegs") : ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticLeg");
                     }
                 }
 
                 if (thoughtDef != null)
                 {
-                    var thought = ThoughtMaker.MakeThought(thoughtDef, stageIndex);
-                    CommonUtils.ApplyIdeologyFactor(pawn, thought);
-                    pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
+                    var thought = ThoughtMaker.MakeThought(thoughtDef) as Thought_Memory;
+                    if (thought != null)
+                    {
+                        CommonUtils.ApplyIdeologyFactor(pawn, thought);
+                        pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
+                    }
                 }
             }
         }

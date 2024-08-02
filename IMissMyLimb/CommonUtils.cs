@@ -1,6 +1,8 @@
-﻿using RimWorld;
-using Verse;
+﻿using HarmonyLib;
+using RimWorld;
+using System;
 using System.Linq;
+using Verse;
 
 public static class CommonUtils
 {
@@ -14,7 +16,7 @@ public static class CommonUtils
         return part.def.defName.Contains("Finger") || part.def.defName.Contains("Toe");
     }
 
-    public static void AssignThought(Pawn pawn, ThoughtDef thoughtDef, BodyPartRecord part, int stageIndex = 0)
+    public static void AssignThought(Pawn pawn, ThoughtDef thoughtDef, BodyPartRecord part)
     {
         if (thoughtDef == null)
         {
@@ -34,8 +36,11 @@ public static class CommonUtils
             return;
         }
 
-        var thought = ThoughtMaker.MakeThought(thoughtDef, stageIndex);
-        pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
+        var thought = ThoughtMaker.MakeThought(thoughtDef) as Thought_Memory;
+        if (thought != null)
+        {
+            pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
+        }
     }
 
     public static bool IsProsthetic(HediffDef hediffDef)
@@ -46,29 +51,19 @@ public static class CommonUtils
             return false;
         }
 
-        if (hediffDef.comps != null)
+        if (hediffDef.hediffClass != typeof(Hediff_Implant) && hediffDef.hediffClass != typeof(Hediff_AddedPart))
         {
-            foreach (var comp in hediffDef.comps)
-            {
-                if (comp is HediffCompProperties_VerbGiver || comp is HediffCompProperties_Disappears)
-                {
-                    return true;
-                }
-
-                if (comp is HediffCompProperties_SeverityPerDay || comp is HediffCompProperties_Immunizable || comp is HediffCompProperties_TendDuration)
-                {
-                    return true;
-                }
-            }
+            return false;
         }
 
-        if (hediffDef.defName.Contains("Prosthetic") || hediffDef.defName.Contains("Bionic") || hediffDef.defName.Contains("SimpleProsthetic"))
+        if (hediffDef.defName.Contains("Prosthetic") || hediffDef.defName.Contains("Bionic") || hediffDef.defName.Contains("SimpleProsthetic") || hediffDef.defName.Contains("Archotech"))
         {
             return true;
         }
 
         return false;
     }
+
 
     public static bool IsArchotech(HediffDef hediffDef)
     {
@@ -85,14 +80,32 @@ public static class CommonUtils
         if (IsFingerOrToe(part))
         {
             pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostFingerToe"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostMultipleFingersToes"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticFingerToe"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotMultipleProstheticFingersToes"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechFingerToe"));
         }
         else if (part.def == BodyPartDefOf.Arm)
         {
             pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostBothArms"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothProstheticArms"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBionicArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothBionicArms"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothArchotechArms"));
         }
         else if (part.def == BodyPartDefOf.Leg)
         {
             pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostBothLegs"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothProstheticLegs"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBionicLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothBionicLegs"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothArchotechLegs"));
         }
     }
 
@@ -115,6 +128,39 @@ public static class CommonUtils
                     }
                 }
             }
+        }
+    }
+
+    public static void RemoveProstheticThought(Pawn pawn, BodyPartRecord part)
+    {
+        if (part == null || pawn.needs?.mood?.thoughts?.memories == null)
+        {
+            return;
+        }
+
+        if (IsFingerOrToe(part))
+        {
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticFingerToe"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotMultipleProstheticFingersToes"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechFingerToe"));
+        }
+        else if (part.def == BodyPartDefOf.Arm)
+        {
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothProstheticArms"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBionicArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothBionicArms"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothArchotechArms"));
+        }
+        else if (part.def == BodyPartDefOf.Leg)
+        {
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothProstheticLegs"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBionicLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothBionicLegs"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotArchotechLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistGotBothArchotechLegs"));
         }
     }
 }
