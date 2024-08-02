@@ -13,11 +13,15 @@ public static class CommonUtils
             Log.Error("IMissMyLimb: BodyPartRecord is null.");
             return false;
         }
-        return part.def.defName.Contains("Finger") || part.def.defName.Contains("Toe");
+        bool isFingerOrToe = part.def.defName.Contains("Finger") || part.def.defName.Contains("Toe");
+        //Log.Message($"IMissMyLimb: IsFingerOrToe - {part.Label}: {isFingerOrToe}"); // Log message to indicate if the part is a finger or toe
+        return isFingerOrToe;
     }
 
     public static void AssignThought(Pawn pawn, ThoughtDef thoughtDef, BodyPartRecord part)
     {
+        //Log.Message($"IMissMyLimb: Assigning thought '{thoughtDef?.defName}' for part '{part?.Label}' to pawn '{pawn?.Label}'."); // Log message to indicate the thought being assigned
+
         if (thoughtDef == null)
         {
             Log.Error("IMissMyLimb: ThoughtDef is null.");
@@ -40,6 +44,11 @@ public static class CommonUtils
         if (thought != null)
         {
             pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
+            //Log.Message($"IMissMyLimb: Thought '{thoughtDef.defName}' successfully assigned to pawn '{pawn.Label}'."); // Log message to indicate successful thought assignment
+        }
+        else
+        {
+            Log.Error($"IMissMyLimb: Failed to make Thought_Memory for '{thoughtDef.defName}'.");
         }
     }
 
@@ -51,27 +60,31 @@ public static class CommonUtils
             return false;
         }
 
-        if (hediffDef.hediffClass != typeof(Hediff_Implant) && hediffDef.hediffClass != typeof(Hediff_AddedPart))
-        {
-            return false;
-        }
+        bool isProsthetic = hediffDef.hediffClass == typeof(Hediff_Implant) || hediffDef.hediffClass == typeof(Hediff_AddedPart);
+        isProsthetic = isProsthetic && (hediffDef.defName.Contains("Prosthetic") || hediffDef.defName.Contains("Bionic") || hediffDef.defName.Contains("SimpleProsthetic") || hediffDef.defName.Contains("Archotech"));
 
-        if (hediffDef.defName.Contains("Prosthetic") || hediffDef.defName.Contains("Bionic") || hediffDef.defName.Contains("SimpleProsthetic") || hediffDef.defName.Contains("Archotech"))
-        {
-            return true;
-        }
-
-        return false;
+        //Log.Message($"IMissMyLimb: IsProsthetic - {hediffDef.defName}: {isProsthetic}"); // Log message to indicate if the hediff is a prosthetic
+        return isProsthetic;
     }
 
+    public static bool IsMissingBodyPart(Hediff hediff)
+    {
+        bool isMissingBodyPart = hediff is Hediff_MissingPart;
+        //Log.Message($"IMissMyLimb: IsMissingBodyPart - {hediff.def.defName}: {isMissingBodyPart}"); // Log message to indicate if the hediff is a missing body part
+        return isMissingBodyPart;
+    }
 
     public static bool IsArchotech(HediffDef hediffDef)
     {
-        return hediffDef.defName.Contains("Archotech");
+        bool isArchotech = hediffDef.defName.Contains("Archotech");
+        //Log.Message($"IMissMyLimb: IsArchotech - {hediffDef.defName}: {isArchotech}"); // Log message to indicate if the hediff is an Archotech
+        return isArchotech;
     }
 
     public static void RemoveNegativeThought(Pawn pawn, BodyPartRecord part)
     {
+        //Log.Message($"IMissMyLimb: Removing negative thoughts for part '{part?.Label}' from pawn '{pawn?.Label}'."); // Log message to indicate the removal of negative thoughts
+
         if (part == null || pawn.needs?.mood?.thoughts?.memories == null)
         {
             return;
@@ -120,11 +133,13 @@ public static class CommonUtils
                 {
                     if (precept.def.defName == "BodyModification_Approved")
                     {
-                        thought.moodPowerFactor += 0.5f; // Adjust this value as needed
+                        thought.moodPowerFactor += 0.5f;
+                        //Log.Message($"IMissMyLimb: Applying ideology factor - Approved. Mood power factor: {thought.moodPowerFactor}");
                     }
                     else if (precept.def.defName == "BodyModification_Disapproved")
                     {
-                        thought.moodPowerFactor -= 0.5f; // Adjust this value as needed
+                        thought.moodPowerFactor -= 0.5f;
+                        //Log.Message($"IMissMyLimb: Applying ideology factor - Disapproved. Mood power factor: {thought.moodPowerFactor}");
                     }
                 }
             }
@@ -133,6 +148,8 @@ public static class CommonUtils
 
     public static void RemoveProstheticThought(Pawn pawn, BodyPartRecord part)
     {
+        //Log.Message($"IMissMyLimb: Removing prosthetic thoughts for part '{part?.Label}' from pawn '{pawn?.Label}'.");
+
         if (part == null || pawn.needs?.mood?.thoughts?.memories == null)
         {
             return;

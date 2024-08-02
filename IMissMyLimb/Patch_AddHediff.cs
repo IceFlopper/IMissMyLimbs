@@ -33,8 +33,32 @@ public static class Patch_AddHediff
                 return;
             }
 
-            // Check if the hediff is a prosthetic
-            if (CommonUtils.IsProsthetic(hediff.def) && hediff.Part != null)
+            Log.Message($"IMissMyLimb: Adding hediff '{hediff.def.defName}' to pawn '{pawn.Label}'.");
+
+            // Check if the hediff is a missing body part
+            if (CommonUtils.IsMissingBodyPart(hediff))
+            {
+                ThoughtDef thoughtDef = null;
+
+                if (CommonUtils.IsFingerOrToe(hediff.Part))
+                {
+                    thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostFingerToe");
+                }
+                else if (hediff.Part.def == BodyPartDefOf.Arm)
+                {
+                    thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostArm");
+                }
+                else if (hediff.Part.def == BodyPartDefOf.Leg)
+                {
+                    thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostLeg");
+                }
+
+                if (thoughtDef != null)
+                {
+                    CommonUtils.AssignThought(pawn, thoughtDef, hediff.Part);
+                }
+            }
+            else if (CommonUtils.IsProsthetic(hediff.def) && hediff.Part != null)
             {
                 // Remove previous prosthetic moodlets
                 CommonUtils.RemoveProstheticThought(pawn, hediff.Part);
@@ -98,6 +122,7 @@ public static class Patch_AddHediff
                     {
                         CommonUtils.ApplyIdeologyFactor(pawn, thought);
                         pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
+                        //Log.Message($"IMissMyLimb: Thought '{thoughtDef.defName}' assigned to pawn '{pawn.Label}'.");
                     }
                 }
             }
