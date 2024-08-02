@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using Verse;
+using System.Linq;
 
 public static class CommonUtils
 {
@@ -10,16 +11,14 @@ public static class CommonUtils
             Log.Error("IMissMyLimb: BodyPartRecord is null.");
             return false;
         }
-        bool result = part.def.defName.Contains("Finger") || part.def.defName.Contains("Toe");
-        // Log.Message($"IMissMyLimb: IsFingerOrToe check for {part.def.defName}: {result}");
-        return result;
+        return part.def.defName.Contains("Finger") || part.def.defName.Contains("Toe");
     }
 
-    public static void AssignThought(Pawn pawn, ThoughtDef thoughtDef, BodyPartRecord part)
+    public static void AssignThought(Pawn pawn, ThoughtDef thoughtDef, BodyPartRecord part, int stageIndex = 0)
     {
         if (thoughtDef == null)
         {
-            Log.Error($"IMissMyLimb: ThoughtDef is null.");
+            Log.Error("IMissMyLimb: ThoughtDef is null.");
             return;
         }
 
@@ -34,14 +33,6 @@ public static class CommonUtils
             Log.Error("IMissMyLimb: Pawn's needs, mood, thoughts, or memories are null.");
             return;
         }
-
-        int stageIndex = 0;
-        if (pawn.health.hediffSet.GetMissingPartsCommonAncestors().Count(x => x.Part?.def == part.def) > 1)
-        {
-            stageIndex = 1; // Use second stage for multiple lost parts of the same type
-        }
-
-        // Log.Message($"IMissMyLimb: Assigning thought {thoughtDef.defName} at stage {stageIndex} to pawn {pawn.Name.ToStringFull} for part {part.def.defName}");
 
         var thought = ThoughtMaker.MakeThought(thoughtDef, stageIndex);
         pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
@@ -61,28 +52,27 @@ public static class CommonUtils
             {
                 if (comp is HediffCompProperties_VerbGiver || comp is HediffCompProperties_Disappears)
                 {
-                    // Log.Message($"IMissMyLimb: {hediffDef.defName} is recognized as a prosthetic.");
                     return true;
                 }
 
-                // Additional checks for common prosthetic properties
                 if (comp is HediffCompProperties_SeverityPerDay || comp is HediffCompProperties_Immunizable || comp is HediffCompProperties_TendDuration)
                 {
-                    // Log.Message($"IMissMyLimb: {hediffDef.defName} has a common prosthetic component.");
                     return true;
                 }
             }
         }
 
-        // Additional checks for known prosthetic keywords
         if (hediffDef.defName.Contains("Prosthetic") || hediffDef.defName.Contains("Bionic") || hediffDef.defName.Contains("SimpleProsthetic"))
         {
-            // Log.Message($"IMissMyLimb: {hediffDef.defName} is recognized by keyword as a prosthetic.");
             return true;
         }
 
-        // Log.Message($"IMissMyLimb: {hediffDef.defName} is not recognized as a prosthetic.");
         return false;
+    }
+
+    public static bool IsArchotech(HediffDef hediffDef)
+    {
+        return hediffDef.defName.Contains("Archotech");
     }
 
     public static void RemoveNegativeThought(Pawn pawn, BodyPartRecord part)
@@ -103,6 +93,28 @@ public static class CommonUtils
         else if (part.def == BodyPartDefOf.Leg)
         {
             pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostLeg"));
+        }
+    }
+
+    public static void ApplyIdeologyFactor(Pawn pawn, Thought_Memory thought)
+    {
+        if (ModsConfig.IdeologyActive)
+        {
+            var precepts = pawn.Ideo?.PreceptsListForReading;
+            if (precepts != null)
+            {
+                foreach (var precept in precepts)
+                {
+                    if (precept.def.defName == "BodyModification_Approved")
+                    {
+                        thought.moodPowerFactor += 0.5f; // Adjust this value as needed
+                    }
+                    else if (precept.def.defName == "BodyModification_Disapproved")
+                    {
+                        thought.moodPowerFactor -= 0.5f; // Adjust this value as needed
+                    }
+                }
+            }
         }
     }
 }
