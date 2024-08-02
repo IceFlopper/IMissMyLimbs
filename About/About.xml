@@ -4,4 +4,8 @@
 	<author>Lewkah0</author>
 	<version>1.0</version>
 	<description>Colonists get upset about losing a limb.</description>
+
+  <modDependencies>
+    <li>brrainz.harmony</li>
+  </modDependencies>
 </ModMetaData>

@@ -51,17 +51,17 @@ public static class Patch_AddHediff
                 if (CommonUtils.IsFingerOrToe(missingPart.Part))
                 {
                     // Log.Message("IMissMyLimb: Missing part is a finger or toe.");
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("ColonistLostFingerToe"), missingPart.Part);
+                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistLostFingerToe"), missingPart.Part);
                 }
                 else if (missingPart.Part.def == BodyPartDefOf.Arm)
                 {
                     // Log.Message("IMissMyLimb: Missing part is an arm.");
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("ColonistLostArm"), missingPart.Part);
+                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistLostArm"), missingPart.Part);
                 }
                 else if (missingPart.Part.def == BodyPartDefOf.Leg)
                 {
                     // Log.Message("IMissMyLimb: Missing part is a leg.");
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("ColonistLostLeg"), missingPart.Part);
+                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistLostLeg"), missingPart.Part);
                 }
             }
             else if (hediff.Part != null && CommonUtils.IsProsthetic(hediff.def))
@@ -71,17 +71,17 @@ public static class Patch_AddHediff
                 if (CommonUtils.IsFingerOrToe(hediff.Part))
                 {
                     // Log.Message("IMissMyLimb: Prosthetic part is a finger or toe.");
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("ColonistGotProstheticFingerToe"), hediff.Part);
+                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticFingerToe"), hediff.Part);
                 }
                 else if (hediff.Part.def == BodyPartDefOf.Arm)
                 {
                     // Log.Message("IMissMyLimb: Prosthetic part is an arm.");
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("ColonistGotProstheticArm"), hediff.Part);
+                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticArm"), hediff.Part);
                 }
                 else if (hediff.Part.def == BodyPartDefOf.Leg)
                 {
                     // Log.Message($"IMissMyLimb: Prosthetic part is a leg: {hediff.def.defName}");
-                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("ColonistGotProstheticLeg"), hediff.Part);
+                    CommonUtils.AssignThought(pawn, ThoughtDef.Named("IMissMyLimb_ColonistGotProstheticLeg"), hediff.Part);
                 }
             }
             else

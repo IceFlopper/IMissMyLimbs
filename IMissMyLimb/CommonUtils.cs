@@ -94,15 +94,15 @@ public static class CommonUtils
 
         if (IsFingerOrToe(part))
         {
-            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("ColonistLostFingerToe"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostFingerToe"));
         }
         else if (part.def == BodyPartDefOf.Arm)
         {
-            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("ColonistLostArm"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostArm"));
         }
         else if (part.def == BodyPartDefOf.Leg)
         {
-            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("ColonistLostLeg"));
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostLeg"));
         }
     }
 }
