@@ -58,6 +58,7 @@
     <Compile Include="Patch_AddHediff.cs" />
     <Compile Include="Patch_RemoveHediff.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ThoughtUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

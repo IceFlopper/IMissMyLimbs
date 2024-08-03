@@ -2,6 +2,7 @@
 using RimWorld;
 using System;
 using Verse;
+
 [HarmonyPatch(typeof(Pawn_HealthTracker))]
 [HarmonyPatch("RemoveHediff")]
 public static class Patch_RemoveHediff
@@ -30,17 +31,13 @@ public static class Patch_RemoveHediff
                 return;
             }
 
-            string pawnName = pawn.Name?.ToStringFull ?? "unknown";
-            string hediffName = hediff.def?.defName ?? "unknown hediff";
-            string partName = hediff.Part?.def?.defName ?? "no body part";
-
             if (hediff.Part != null && hediff is Hediff_MissingPart)
             {
-                CommonUtils.RemoveNegativeThought(pawn, hediff.Part);
+                ThoughtUtils.RemoveNegativeThought(pawn, hediff.Part);
             }
             else if (hediff.Part != null && CommonUtils.IsProsthetic(hediff.def))
             {
-                CommonUtils.RemoveNegativeThought(pawn, hediff.Part);
+                ThoughtUtils.RemoveNegativeThought(pawn, hediff.Part);
 
                 ThoughtDef thoughtDef = null;
 
@@ -62,7 +59,8 @@ public static class Patch_RemoveHediff
                     var thought = ThoughtMaker.MakeThought(thoughtDef) as Thought_Memory;
                     if (thought != null)
                     {
-                        CommonUtils.ApplyIdeologyFactor(pawn, thought);
+                        ThoughtUtils.ApplyIdeologyFactor(pawn, thought);
+                        ThoughtUtils.ApplyTraitModifiers(pawn, thought);
                         pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
                     }
                 }

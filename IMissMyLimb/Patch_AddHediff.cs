@@ -35,7 +35,6 @@ public static class Patch_AddHediff
 
             Log.Message($"IMissMyLimb: Adding hediff '{hediff.def.defName}' to pawn '{pawn.Label}'.");
 
-            // Check if the hediff is a missing body part
             if (CommonUtils.IsMissingBodyPart(hediff))
             {
                 ThoughtDef thoughtDef = null;
@@ -55,20 +54,18 @@ public static class Patch_AddHediff
 
                 if (thoughtDef != null)
                 {
-                    CommonUtils.AssignThought(pawn, thoughtDef, hediff.Part);
+                    ThoughtUtils.AssignThought(pawn, thoughtDef, hediff.Part);
                 }
             }
             else if (CommonUtils.IsProsthetic(hediff.def) && hediff.Part != null)
             {
-                // Remove previous prosthetic moodlets
-                CommonUtils.RemoveProstheticThought(pawn, hediff.Part);
+                ThoughtUtils.RemoveProstheticThought(pawn, hediff.Part);
 
                 ThoughtDef thoughtDef = null;
 
                 int prostheticArmCount = pawn.health.hediffSet.hediffs.Count(h => h.Part?.def == BodyPartDefOf.Arm && CommonUtils.IsProsthetic(h.def));
                 int prostheticLegCount = pawn.health.hediffSet.hediffs.Count(h => h.Part?.def == BodyPartDefOf.Leg && CommonUtils.IsProsthetic(h.def));
 
-                // Determine the new thought based on the type of prosthetic
                 if (CommonUtils.IsArchotech(hediff.def))
                 {
                     if (CommonUtils.IsFingerOrToe(hediff.Part))
@@ -120,9 +117,9 @@ public static class Patch_AddHediff
                     var thought = ThoughtMaker.MakeThought(thoughtDef) as Thought_Memory;
                     if (thought != null)
                     {
-                        CommonUtils.ApplyIdeologyFactor(pawn, thought);
+                        ThoughtUtils.ApplyIdeologyFactor(pawn, thought);
+                        ThoughtUtils.ApplyTraitModifiers(pawn, thought);
                         pawn.needs.mood.thoughts.memories.TryGainMemory(thought);
-                        //Log.Message($"IMissMyLimb: Thought '{thoughtDef.defName}' assigned to pawn '{pawn.Label}'.");
                     }
                 }
             }
