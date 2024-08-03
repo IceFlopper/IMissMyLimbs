@@ -33,7 +33,7 @@ public static class Patch_AddHediff
                 return;
             }
 
-            Log.Message($"IMissMyLimb: Adding hediff '{hediff.def.defName}' to pawn '{pawn.Label}'.");
+            Log.Message($"IMissMyLimb: Adding hediff '{hediff.def.defName}' to pawn '{pawn.Label}'. Hediff: {hediff}, Part: {hediff.Part}, Pawn: {pawn}");
 
             if (CommonUtils.IsMissingBodyPart(hediff))
             {
@@ -43,11 +43,11 @@ public static class Patch_AddHediff
                 {
                     thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostFingerToe");
                 }
-                else if (hediff.Part.def == BodyPartDefOf.Arm)
+                else if (hediff.Part != null && hediff.Part.def == BodyPartDefOf.Arm)
                 {
                     thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostArm");
                 }
-                else if (hediff.Part.def == BodyPartDefOf.Leg)
+                else if (hediff.Part != null && hediff.Part.def == BodyPartDefOf.Leg)
                 {
                     thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostLeg");
                 }
