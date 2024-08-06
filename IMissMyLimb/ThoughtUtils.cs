@@ -19,7 +19,6 @@ public static class ThoughtUtils
 
         if (pawn.needs == null || pawn.needs.mood == null || pawn.needs.mood.thoughts == null || pawn.needs.mood.thoughts.memories == null)
         {
-            Log.Error("IMissMyLimb: Pawn's needs, mood, thoughts, or memories are null.");
             return;
         }
 

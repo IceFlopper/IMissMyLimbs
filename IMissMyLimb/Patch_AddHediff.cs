@@ -33,7 +33,7 @@ public static class Patch_AddHediff
                 return;
             }
 
-            Log.Message($"IMissMyLimb: Adding hediff '{hediff.def.defName}' to pawn '{pawn.Label}'. Hediff: {hediff}, Part: {hediff.Part}, Pawn: {pawn}");
+            //Log.Message($"IMissMyLimb: Adding hediff '{hediff.def.defName}' to pawn '{pawn.Label}'. Hediff: {hediff}, Part: {hediff.Part}, Pawn: {pawn}");
 
             if (CommonUtils.IsMissingBodyPart(hediff))
             {
