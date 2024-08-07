@@ -33,15 +33,24 @@ public static class Patch_AddHediff
                 return;
             }
 
-            //Log.Message($"IMissMyLimb: Adding hediff '{hediff.def.defName}' to pawn '{pawn.Label}'. Hediff: {hediff}, Part: {hediff.Part}, Pawn: {pawn}");
-
             if (CommonUtils.IsMissingBodyPart(hediff))
             {
+                int missingArmCount = pawn.health.hediffSet.hediffs.Count(h => h.Part?.def == BodyPartDefOf.Arm && CommonUtils.IsMissingBodyPart(h));
+                int missingLegCount = pawn.health.hediffSet.hediffs.Count(h => h.Part?.def == BodyPartDefOf.Leg && CommonUtils.IsMissingBodyPart(h));
+
                 ThoughtDef thoughtDef = null;
 
                 if (CommonUtils.IsFingerOrToe(hediff.Part))
                 {
                     thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostFingerToe");
+                }
+                else if (missingArmCount > 1)
+                {
+                    thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostBothArms");
+                }
+                else if (missingLegCount > 1)
+                {
+                    thoughtDef = ThoughtDef.Named("IMissMyLimb_ColonistLostBothLegs");
                 }
                 else if (hediff.Part != null && hediff.Part.def == BodyPartDefOf.Arm)
                 {
@@ -129,4 +138,5 @@ public static class Patch_AddHediff
             Log.Error($"IMissMyLimb: Exception in AddHediff Postfix: {ex}");
         }
     }
+
 }

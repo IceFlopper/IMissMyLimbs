@@ -22,6 +22,16 @@ public static class ThoughtUtils
             return;
         }
 
+        // Remove single limb loss thought if adding both limbs loss thought
+        if (thoughtDef.defName == "IMissMyLimb_ColonistLostBothArms")
+        {
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostArm"));
+        }
+        else if (thoughtDef.defName == "IMissMyLimb_ColonistLostBothLegs")
+        {
+            pawn.needs.mood.thoughts.memories.RemoveMemoriesOfDef(ThoughtDef.Named("IMissMyLimb_ColonistLostLeg"));
+        }
+
         var thought = ThoughtMaker.MakeThought(thoughtDef) as Thought_Memory;
         if (thought != null)
         {
@@ -33,6 +43,7 @@ public static class ThoughtUtils
             Log.Error($"IMissMyLimb: Failed to make Thought_Memory for '{thoughtDef.defName}'.");
         }
     }
+
 
     public static void RemoveNegativeThought(Pawn pawn, BodyPartRecord part)
     {
